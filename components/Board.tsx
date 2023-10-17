@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import Column from "./Column";
 import { StrictModeDroppable as Droppable } from "@/helpers/StrictModeDroppable";
-import { stat } from "fs";
 
 function Board() {
   const [board, getBoard, setBoardState, updateTodoInDB] = useBoardStore(
@@ -41,13 +40,8 @@ function Board() {
 
     //needed as the indexes are store as number 0,1,2,etc. Instead of id's with dnd library
     const columns = Array.from(board.columns);
-    console.log(columns);
     const startColIndex = columns[Number(source.droppableId)];
-    // const startColIndex = columns[source.index];
-    console.log(source.droppableId);
-    console.log(startColIndex);
     const finishColIndex = columns[Number(destination.droppableId)];
-    // const finishColIndex = columns[destination.index];
     if (startColIndex === undefined && finishColIndex === undefined) {
       return;
     }
@@ -55,13 +49,11 @@ function Board() {
       id: startColIndex[0],
       todos: startColIndex[1].todos,
     };
-    console.log(startCol);
 
     const finishCol: Column = {
       id: finishColIndex[0],
       todos: finishColIndex[1].todos,
     };
-    console.log(finishCol.todos);
 
     if (!startCol || !finishCol) return;
     if (source.index === destination.index && startCol === finishCol) return;
@@ -83,11 +75,9 @@ function Board() {
     } else {
       //dragging to another column
       const finishTodos = Array.from(finishCol.todos);
-      console.log(finishTodos);
       finishTodos.splice(destination.index, 0, todoMoved);
 
       const newColumns = new Map(board.columns);
-      console.log(newColumns);
 
       const newCol = {
         id: startCol.id,
@@ -95,7 +85,6 @@ function Board() {
       };
 
       newColumns.set(startCol.id, newCol);
-      console.log(newColumns);
 
       newColumns.set(finishCol.id, {
         id: finishCol.id,
@@ -104,9 +93,6 @@ function Board() {
 
       //update DB
       updateTodoInDB(todoMoved, finishCol.id);
-
-      console.log(todoMoved);
-      console.log(finishCol.id);
 
       setBoardState({ ...board, columns: newColumns });
     }
